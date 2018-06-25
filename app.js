@@ -10,22 +10,17 @@ let static = require('serve-static');
 
 // 라우터 객체 참조
 let cookieParser = require('cookie-parser')
-var errorHandler = require('errorhandler');
 
 // 에러 핸들러 모듈 사용
-var expressErrorHandler = require('express-error-handler');
+var error = require('./routes/error');
 
 // Session 미들웨어 불러오기
 var expressSession = require('express-session');
 
-// MySQL 데이터베이스를 사용할 수 있도록 하는 mysql 모듈 불러오기
-var mysql = require('mysql');
-
-// user에 관한 함수 모듈
-var user = require('./routes/user');
-
+// config 파일 불러오기
 var config = require('./config');
 
+// 라우팅 처리 모듈 불러오기
 var route_loader = require('./routes/route_loader');
 
 // 익스프레스 객체 생성
@@ -53,31 +48,16 @@ app.use(expressSession({
 	saveUninitialized:true
 }));
  
+// database pool 설정
+app.set('pool', config.pool);
 
-// MySQL 데이터베이스 연결 설정
-var pool      =    mysql.createPool({
-    connectionLimit : 10, // Connection을 몇 개 만들지 설정
-    host     : 'localhost',
-    user     : 'root', // 데이터베이스 User
-    password : '12345', // password 입력
-    database : 'test', // 데이터베이스 명 입력
-    debug    :  false
-});
-
-app.set('pool', pool);
-
-
+// router 설정
 route_loader.init(app, express.Router());
 
-// 404 에러 페이지 처리
-var errorHandler = expressErrorHandler({
- static: {
-   '404': './public/404.html'
- }
-});
 
-app.use( expressErrorHandler.httpError(404) );
-app.use( errorHandler );
+// Error Page 처리
+app.use( error.httpError );
+app.use( error.errorHandler );
 
 
 //===== 서버 시작 =====//
