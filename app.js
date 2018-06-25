@@ -11,14 +11,19 @@ let static = require('serve-static');
 // 라우터 객체 참조
 let cookieParser = require('cookie-parser')
 
-// 에러 핸들러 모듈 사용
-var error = require('./routes/error');
-
 // Session 미들웨어 불러오기
 var expressSession = require('express-session');
 
+// 에러 핸들러 모듈 사용
+var error = require('./routes/error');
+
+// Passport 사용
+var passport = require('passport');
+var flash = require('connect-flash');
+
+
 // config 파일 불러오기
-var config = require('./config');
+var config = require('./config/config');
 
 // 라우팅 처리 모듈 불러오기
 var route_loader = require('./routes/route_loader');
@@ -47,12 +52,32 @@ app.use(expressSession({
 	resave:true,
 	saveUninitialized:true
 }));
+
+
+// Passport 사용 설정 
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash())
+
+
  
 // database pool 설정
 app.set('pool', config.pool);
 
+//패스포트 로그인 설정
+passport.use('local-login', );
+
+var router = express.Router();
 // router 설정
-route_loader.init(app, express.Router());
+route_loader.init(app, router);
+
+// 패스포트 설정
+var configPassport = require('./config/passport');
+configPassport(app, passport);
+
+// 패스포트 라우팅 설정
+var userPassport = require('./routes/user_passport');
+userPassport(router, passport);
 
 
 // Error Page 처리
@@ -60,7 +85,7 @@ app.use( error.httpError );
 app.use( error.errorHandler );
 
 
-//===== 서버 시작 =====//
+// 서버 시작
 
 // 프로세스 종료 시에 데이터베이스 연결 해제
 process.on('SIGTERM', function () {
