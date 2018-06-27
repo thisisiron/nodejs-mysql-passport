@@ -1,12 +1,12 @@
-let express = require('express');
-let http = require('http');
-let path = require('path');
+const express = require('express');
+const http = require('http');
+const path = require('path');
 
 // Post 방식 사용
-let bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 
 // Folder 개방
-let static = require('serve-static');
+const static = require('serve-static');
 
 // 라우터 객체 참조
 let cookieParser = require('cookie-parser')
@@ -28,7 +28,7 @@ var route_loader = require('./routes/route_loader');
 var error = require('./routes/error');
 
 // 익스프레스 객체 생성
-var app = express();
+const app = express();
 
 // 뷰 엔진 설정
 app.set('views', __dirname + '/views');
@@ -70,7 +70,7 @@ app.set('pool', config.pool);
 
 app.set('passport', passport);
 
-var router = express.Router();
+const router = express.Router();
 // router 설정
 route_loader.init(app, router);
 
@@ -87,8 +87,6 @@ userPassport(router, passport);
 app.use( error.httpError );
 app.use( error.errorHandler );
 
-
-// 서버 시작
 
 // 프로세스 종료 시에 데이터베이스 연결 해제
 process.on('SIGTERM', function () {
