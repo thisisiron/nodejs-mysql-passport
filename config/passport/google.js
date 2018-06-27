@@ -1,14 +1,13 @@
-var FacebookStrategy = require('passport-facebook').Strategy;
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var config = require('../config');
 
 module.exports = function(app, passport) {
-	return new FacebookStrategy({
-		clientID: config.facebook.clientID,
-		clientSecret: config.facebook.clientSecret,
-		callbackURL: config.facebook.callbackURL,
-		profileFields: ['email', 'displayName']
+	return new GoogleStrategy({
+    	clientID: config.google.clientID,
+    	clientSecret: config.google.clientSecret,
+    	callbackURL: config.google.callbackURL
 	}, function(accessToken, refreshToken, profile, done) {
-		console.log('passport의 facebook 호출됨.');
+		console.log('passport의 google 호출됨.');
 		console.dir(profile);
 		
 		config.pool.getConnection(function(err, conn) {
@@ -24,23 +23,24 @@ module.exports = function(app, passport) {
 			
 			
 			// SQL 문을 실행합니다.
-			conn.query("select * from user where facebook_id = ?", profile.id, function(err, user) {
+			conn.query("select * from user where google_id = ?", profile.id, function(err, user) {
 				conn.release();  // 반드시 해제해야 함
 	
 				if(err) {
 					done(err, null);
 					return;
 				}
-				
+				console.log("profile json: "+profile._json);
 				console.log("user "+ user)
 
 				if (!user.length) {
 
 					var data = {
-						provider:profile.provider,
+						provider:'google',
 						name:profile.displayName,
-						id:profile._json.email,
-						facebook_id:profile.id,
+						id:profile.emails[0].value,
+						google_id:profile.id,
+						// email: profile.emails[0].value,
 						password:''
 					};
 
@@ -55,8 +55,7 @@ module.exports = function(app, passport) {
 							return;
 						}
 						// 삽입 후 데이터를 넘겨줌.
-						// 수정필요: 굳이 SQL문 사용하지 않고 위에 있는 data 객체 전달해보기.
-						conn.query("select * from user where id = ?", [profile._json.email], function(err, rows) {
+						conn.query("select * from user where id = ?", [profile.id], function(err, rows) {
 							if(err){
 								done(err, null);
 								return;

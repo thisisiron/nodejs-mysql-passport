@@ -75,4 +75,15 @@ module.exports = function(router, passport) {
         failureRedirect : '/'
     }));
 
+    // 패스포트 - 구글 인증 라우팅 
+    router.route('/auth/google').get(passport.authenticate('google', { 
+        scope : 'email' 
+    }));
+
+    // 패스포트 - 구글 인증 콜백 라우팅
+    router.route('/auth/google/callback').get(passport.authenticate('google', {
+        successRedirect : '/profile',
+        failureRedirect : '/'
+    }));
+
 };
