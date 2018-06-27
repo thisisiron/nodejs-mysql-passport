@@ -14,13 +14,9 @@ let cookieParser = require('cookie-parser')
 // Session 미들웨어 불러오기
 var expressSession = require('express-session');
 
-// 에러 핸들러 모듈 사용
-var error = require('./routes/error');
-
 // Passport 사용
 var passport = require('passport');
 var flash = require('connect-flash');
-
 
 // config 파일 불러오기
 var config = require('./config/config');
@@ -28,8 +24,16 @@ var config = require('./config/config');
 // 라우팅 처리 모듈 불러오기
 var route_loader = require('./routes/route_loader');
 
+// 에러 핸들러 모듈 사용
+var error = require('./routes/error');
+
 // 익스프레스 객체 생성
 var app = express();
+
+// 뷰 엔진 설정
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
+app.engine('html', require('ejs').renderFile);
 
 // 설정 파일에 들어있는 port 정보 사용하여 포트 설정
 app.set('port', config.server_port);
@@ -64,8 +68,7 @@ app.use(flash())
 // database pool 설정
 app.set('pool', config.pool);
 
-//패스포트 로그인 설정
-passport.use('local-login', );
+app.set('passport', passport);
 
 var router = express.Router();
 // router 설정
