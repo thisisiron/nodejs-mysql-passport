@@ -12,9 +12,14 @@ var config = {
         debug    :  false
     }),
     route_info: [
-        {file:'./user', path:'/process/login', method:'login', type:'post'},
-        {file:'./user', path:'/process/adduser', method:'adduser', type:'post'},
-    ]
+        {file:'../routes/user', path:'/', method:'home', type:'get'},
+        // {file:'../routes/user', path:'/login', method:'login', type:'post'},
+    ],
+    facebook:{
+        clientID: "",
+        clientSecret:"",
+        callbackURL: '/auth/facebook/callback'
+    }
 };
 
 
