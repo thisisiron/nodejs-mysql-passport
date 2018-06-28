@@ -68,7 +68,7 @@ module.exports = function(app, passport) {
 				}
 				else {
 					console.log('기존에 계정이 있음.');
-					return done(err, user);
+					return done(err, user[0]);
 				}
 				
 			});

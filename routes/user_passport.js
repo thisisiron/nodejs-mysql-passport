@@ -30,15 +30,14 @@ module.exports = function(router, passport) {
             console.log('/profile 패스 요청됨.');
             console.dir(req.user);
 
-            if (Array.isArray(req.user)) {
-                // res.send(req.user);
-                console.log("배열로 전달")
-                console.log(req.user[0])
-                res.render('profile.ejs', {user: req.user[0]});
-            } else {
-                // res.send(req.user);
-                res.render('profile.ejs', {user: req.user});
-            }
+
+            // Local과 Passport user 정보 전달 방식이 달랐음.
+            // if (Array.isArray(req.user)) {
+            //     res.render('profile.ejs', {user: req.user[0]});
+            // } else {
+            //     res.render('profile.ejs', {user: req.user});
+            // }
+            res.render('profile.ejs', {user: req.user});
         }
     });
 	

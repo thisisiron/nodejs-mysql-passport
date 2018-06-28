@@ -15,18 +15,38 @@ module.exports.home = function(req, res) {
 	}
 } 
 
-module.exports.board = function(req, res){
+module.exports.board = function(req, res) {
+	console.log('/board 패스 요청됨.');
+
+	// 인증 안된 경우
+	if (!req.user) {
+		console.log('사용자 인증 안된 상태임.');
+		res.render('index.ejs', {login_success:false});
+	} else { // 인증된 경우
+
+		console.log('req.user의 정보');
+		console.dir(req.user);
+
+		console.log('사용자 인증된 상태임.');
+		res.render('board.html', {login_success:true});
+	}
+} 
+
+module.exports.addContent = function(req, res){
 	console.log('/board 패스 요청');
 
-	var paramId = req.body.id || req.query.id;
-    var paramContent = req.body.content || req.query.content;
+	var paramTitle = req.body.title || req.query.title;
+	var paramContents = req.body.contents || req.query.contents;
+	var praamId = req.user.id;
 
-	console.log('요청 파라미터 : ' + paramId + ', ' + paramContent);
+	console.log('req.user의 정보');
+	console.dir(req.user);
+	console.log('요청 파라미터 : ' + praamId + ', ' + paramTitle + ', ' + paramContents);
 
 	const pool = req.app.get('pool');
 
 	if (pool) {
-		writeContent(pool, paramId, paramContent, function(err, rows) {
+		writeContent(pool, praamId, paramTitle, paramContents, function(err, rows) {
 			// 에러 발생 시, 클라이언트로 에러 전송
 			if (err) {
 				console.error('에러 발생 : ' + err.stack);
@@ -36,7 +56,7 @@ module.exports.board = function(req, res){
 			// 조회된 레코드가 있으면 성공 응답 전송
 			if (rows) {
 				console.dir(rows);
-
+				res.redirect('/profile');
 			
 			} else {  // 조회된 레코드가 없는 경우 실패 응답 전송
 
@@ -48,8 +68,8 @@ module.exports.board = function(req, res){
 }
 
 
-var writeContent = function(pool, id, content, callback) {
-		console.log('writeContent 호출됨 : ' + id + ', ' + content);
+var writeContent = function(pool, id, title, contents, callback) {
+		console.log('writeContent 호출됨 : ' + id + ', ' + title + ', ' + contents);
 	
 		// 커넥션 풀에서 연결 객체를 가져옴
 		pool.getConnection(function(err, conn) {
@@ -61,13 +81,14 @@ var writeContent = function(pool, id, content, callback) {
 	            return;
 	        }   
 	        console.log('데이터베이스 연결 스레드 아이디 : ' + conn.threadId);
-	          
-	        var columns = ['id', 'name', 'age'];
-	        var tablename = 'user';
-	 
-			// SQL 문을 실행합니다.
-			// SQL문 다시 작성해야함.
-	        var exec = conn.query("select ?? from ?? where id = ? and  = ?", [columns, tablename, id, content], function(err, rows) {
+
+			var data = {
+				user_id: id,
+				title: title,
+				contents: contents
+			}
+
+	        var exec = conn.query("insert into board set ?", data, function(err, rows) {
 	            conn.release();  // 반드시 해제해야 함
 	            console.log('실행 대상 SQL : ' + exec.sql);
 	
@@ -76,13 +97,16 @@ var writeContent = function(pool, id, content, callback) {
 	                return;
 	            }
 	            
-	            if (rows.length > 0) {
-	    	    	console.log('아이디 [%s]와 내용 [%s] 출력', id, content);
-	    	    	callback(null, rows);
-	            } else {
-	            	console.log("일치하는 사용자를 찾지 못함.");
-	    	    	callback(null, null);
-	            }
+	            // if (rows.length > 0) {
+	    	    // 	console.log('아이디 [%s]와 내용 [%s] 출력', id, content);
+	    	    	
+	            // } else {
+	            // 	console.log("일치하는 사용자를 찾지 못함.");
+	    	    // 	callback(null, null);
+				// }
+				console.log("rows 출력")
+				console.dir(rows)
+				callback(null, rows);
 	        });
 	
 	        conn.on('error', function(err) {      
