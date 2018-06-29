@@ -64,9 +64,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash())
 
-// // database pool 설정
-// app.set('pool', config.pool);
-
 // 모듈로 분리한 데이터베이스 파일 불러오기
 var database = require('./database/database');
 

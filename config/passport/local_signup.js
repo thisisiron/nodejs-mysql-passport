@@ -1,5 +1,5 @@
 var LocalStrategy = require('passport-local').Strategy;
-var config = require('../config')
+var encrypto = require('../crypto');
 module.exports = new LocalStrategy({
 		usernameField : 'id',
 		passwordField : 'password',
@@ -32,11 +32,14 @@ module.exports = new LocalStrategy({
 				}
 
 				else if (!rows.length) {
-
+					const salt = encrypto.makeSalt()
+					var hashed_password = encrypto.encryptPassword(password, salt)
+					
 					var data = {
 						id:id,
-						password:password,
-						name:paramName
+						password:hashed_password,
+						name:paramName,
+						salt: salt
 					};
 
 					database.user.insertUser(database.pool, data, function(err, rows) {
@@ -67,3 +70,5 @@ module.exports = new LocalStrategy({
 		}
 	}
 );
+
+

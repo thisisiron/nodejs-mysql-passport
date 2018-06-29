@@ -1,5 +1,5 @@
 var LocalStrategy = require('passport-local').Strategy;
-var config = require('../config');
+var encrypto = require('../crypto')
 
 module.exports = new LocalStrategy({
 	usernameField : 'id',
@@ -13,8 +13,7 @@ module.exports = new LocalStrategy({
 	if (database.pool) {
 
 		const data = [
-			id,
-			password,
+			id
 		]
 		
 		console.dir(database.user);
@@ -26,15 +25,20 @@ module.exports = new LocalStrategy({
 				return;
 			}
 
+
+			const authenticated = encrypto.authenticate(password, rows[0].salt, rows[0].password)
+	
 			// 결과 객체 있으면 성공 응답 전송
 			if (!rows.length) {
 				return done(null, false, req.flash('loginMessage', '등록된 계정이 없습니다.'));
-			} else if (password != rows[0].password){
+			} else if (!authenticated){
 				console.log("비밀번호가 틀렸습니다.")
 				return done(null, false, req.flash('loginMessage', '비밀번호가 일치하지 않습니다.'));
 			}
+
 			console.log('계정과 비밀번호가 일치함.');
 			return done(null, rows[0]);
+		
 		});
 
 	}
