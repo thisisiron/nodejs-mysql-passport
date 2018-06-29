@@ -8,38 +8,35 @@ module.exports = new LocalStrategy({
 }, function(req, id, password, done) { 
 	console.log('passport의 local-login 호출됨 : ' + id + ', ' + password);
 	
-	config.pool.getConnection(function(err, conn) {
-        if (err) {
-        	if (conn) {
-                conn.release();  // 반드시 해제해야 함
-            }
-            callback(err, null);
-            return;
-        }   
-        console.log('데이터베이스 연결 스레드 아이디 : ' + conn.threadId);
+	var database = req.app.get('database');
 
-        // SQL 문을 실행합니다.
-        conn.query("select * from user where id = ?", [id], function(err, rows) {
-            conn.release();  // 반드시 해제해야 함
+	if (database.pool) {
 
-            if(err){
-                callback(err, null);
-                return;
-            }
-            
-            if (!rows.length) {
-            	return done(null, false, req.flash('loginMessage', '등록된 계정이 없습니다.'));
+		const data = [
+			id,
+			password,
+		]
+		
+		console.dir(database.user);
+		
+		database.user.loginUser(database.pool, data, function(err, rows) {
+			// 에러 발생 시 - 클라이언트로 에러 전송
+			if (err) {
+				console.error('User 저장 중 에러 발생 : ' + err.stack);
+				return;
 			}
-			
-			if (password != rows[0].password){
+
+			// 결과 객체 있으면 성공 응답 전송
+			if (!rows.length) {
+				return done(null, false, req.flash('loginMessage', '등록된 계정이 없습니다.'));
+			} else if (password != rows[0].password){
 				console.log("비밀번호가 틀렸습니다.")
 				return done(null, false, req.flash('loginMessage', '비밀번호가 일치하지 않습니다.'));
 			}
-				
-			
 			console.log('계정과 비밀번호가 일치함.');
 			return done(null, rows[0]);
 		});
-	});
+
+	}
 });
 

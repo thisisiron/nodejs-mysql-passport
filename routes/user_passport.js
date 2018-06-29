@@ -37,6 +37,7 @@ module.exports = function(router, passport) {
             // } else {
             //     res.render('profile.ejs', {user: req.user});
             // }
+            
             res.render('profile.ejs', {user: req.user});
         }
     });

@@ -43,78 +43,113 @@ module.exports.addContent = function(req, res){
 	console.dir(req.user);
 	console.log('요청 파라미터 : ' + praamId + ', ' + paramTitle + ', ' + paramContents);
 
-	const pool = req.app.get('pool');
+	var database = req.app.get('database');
 
-	if (pool) {
-		writeContent(pool, praamId, paramTitle, paramContents, function(err, rows) {
-			// 에러 발생 시, 클라이언트로 에러 전송
+	if (database.pool) {
+
+		var data = {
+			user_id: praamId,
+			title: paramTitle,
+			contents: paramContents
+		}
+		
+		
+		
+		database.board.writeContent(database.pool, data, function(err, rows) {
+			// 에러 발생 시 - 클라이언트로 에러 전송
 			if (err) {
-				console.error('에러 발생 : ' + err.stack);
+				console.error('User 저장 중 에러 발생 : ' + err.stack);
 				return;
 			}
-			
-			// 조회된 레코드가 있으면 성공 응답 전송
+
+			// 결과 객체 있으면 성공 응답 전송
 			if (rows) {
 				console.dir(rows);
 				res.redirect('/profile');
-			
-			} else {  // 조회된 레코드가 없는 경우 실패 응답 전송
-
+			} else {
+				console.log('Content 저장 실패')
 			}
 		});
-	} else {  // 데이터베이스 객체가 초기화되지 않은 경우 실패 응답 전송
-		console.log('데이터베이스 연결 실패')
+
 	}
+
+	
 }
 
-
-var writeContent = function(pool, id, title, contents, callback) {
-		console.log('writeContent 호출됨 : ' + id + ', ' + title + ', ' + contents);
+module.exports.photosave = function(req, res) {
+	console.log('/process/save 호출.');
 	
-		// 커넥션 풀에서 연결 객체를 가져옴
-		pool.getConnection(function(err, conn) {
-	        if (err) {
-	        	if (conn) {
-	                conn.release();  // 반드시 해제해야 함
-	            }
-	            callback(err, null);
-	            return;
-	        }   
-	        console.log('데이터베이스 연결 스레드 아이디 : ' + conn.threadId);
-
-			var data = {
-				user_id: id,
-				title: title,
-				contents: contents
-			}
-
-	        var exec = conn.query("insert into board set ?", data, function(err, rows) {
-	            conn.release();  // 반드시 해제해야 함
-	            console.log('실행 대상 SQL : ' + exec.sql);
-	
-	            if(err){
-	                callback(err, null);
-	                return;
-	            }
-	            
-	            // if (rows.length > 0) {
-	    	    // 	console.log('아이디 [%s]와 내용 [%s] 출력', id, content);
-	    	    	
-	            // } else {
-	            // 	console.log("일치하는 사용자를 찾지 못함.");
-	    	    // 	callback(null, null);
-				// }
-				console.log("rows 출력")
-				console.dir(rows)
-				callback(null, rows);
-	        });
-	
-	        conn.on('error', function(err) {      
-	            console.log('데이터베이스 연결 시 에러 발생함.');
-	            console.dir(err);
-	            
-	            callback(err, null);
-	      });
-	    });
+	try {
+		var paramAuthor = req.body.author;
+        var paramContents = req.body.contents;
+		var paramCreateDate = req.body.createDate;
 		
-	}
+		console.log('작성자 : ' + paramAuthor);
+		console.log('내용 : ' + paramContents);
+		console.log('일시 : ' + paramCreateDate);
+ 
+ 
+        var files = req.files;
+	
+		console.dir('#===== 업로드된 첫번째 파일 정보 =====#')
+        console.dir(req.files[0]);
+        console.dir('#=====#')
+        
+		// 현재의 파일 정보를 저장할 변수 선언
+		var originalname = '',
+			filename = '',
+			mimetype = '',
+			size = 0;
+		
+			if (Array.isArray(files)) {   // 배열에 들어가 있는 경우 (설정에서 1개의 파일도 배열에 넣게 했음)
+				console.log("배열에 들어있는 파일 갯수 : %d", files.length);
+				
+				for (var index = 0; index < files.length; index++) {
+					originalname = files[index].originalname;
+					filename = files[index].filename;
+					mimetype = files[index].mimetype;
+					size = files[index].size;
+				}
+	
+				console.log('현재 파일 정보 : ' + originalname + ', ' + filename + ', ' + mimetype + ', ' + size);
+	
+			} else {
+				console.log('업로드된 파일이 배열에 들어가 있지 않습니다.');
+			}
+		
+        
+        var database = req.app.get('database');
+
+        if (database.pool) {
+
+            var data = {
+                author:paramAuthor,
+                contents:paramContents,
+                createDate:paramCreateDate,
+                filename:filename
+            };
+            
+            console.dir(database.memo);
+            
+            database.memo.insertMemo(database.pool, data, function(err, added) {
+                
+                if (err) {
+                    //에러발생
+                    return;
+                }
+                
+                if (added) {
+                    //성공
+                } else {
+                    console.log('파일저장실패')
+                }
+            });
+
+        }
+        
+	} catch(err) {
+		//파일저장에러시 에러발생
+		console.dir(err.stack);
+	}	
+		
+};

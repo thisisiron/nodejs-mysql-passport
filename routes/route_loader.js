@@ -2,13 +2,13 @@ var route_loader = {};
 
 var config = require('../config/config');
 
-route_loader.init = (app, router) => {
+route_loader.init = (app, router, upload) => {
     console.log('route_loader init 호출')
     
-    initRoutes(app, router);
+    initRoutes(app, router, upload);
 }
 
-function initRoutes(app, router) {
+function initRoutes(app, router, upload) {
     console.log('initRoutes 호출됨.')
 
     var infoLen = config.route_info.length;
@@ -26,7 +26,11 @@ function initRoutes(app, router) {
 		if (curItem.type == 'get') {
             router.route(curItem.path).get(curModule[curItem.method]);
 		} else if (curItem.type == 'post') {
-            router.route(curItem.path).post(curModule[curItem.method]);
+			if (curItem.upload) {
+                router.route(curItem.path).post(upload.array(curItem.upload, 1), curModule[curItem.method]);
+            } else {
+                router.route(curItem.path).post(curModule[curItem.method]);
+            }
 		} else {
             console.log("라우팅 함수의 타입을 알 수 없다.")
 			router.route(curItem.path).post(curModule[curItem.method]);

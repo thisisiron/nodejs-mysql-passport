@@ -44,8 +44,9 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // body-parser를 이용해 application/json 파싱
 app.use(bodyParser.json())
 
-// public 폴더를 static으로 오픈
+// public 폴더, uploads 폴더를 static으로 오픈
 app.use('/public', static(path.join(__dirname, 'public')));
+app.use('/uploads', static(path.join(__dirname, 'uploads')));
  
 // cookie-parser 설정
 app.use(cookieParser());
@@ -63,16 +64,19 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash())
 
+// // database pool 설정
+// app.set('pool', config.pool);
 
- 
-// database pool 설정
-app.set('pool', config.pool);
+// 모듈로 분리한 데이터베이스 파일 불러오기
+var database = require('./database/database');
 
 app.set('passport', passport);
 
 const router = express.Router();
+const upload = require('./config/fileupload').upload
+
 // router 설정
-route_loader.init(app, router);
+route_loader.init(app, router, upload);
 
 // 패스포트 설정
 var configPassport = require('./config/passport');
@@ -93,12 +97,23 @@ process.on('SIGTERM', function () {
     console.log("프로세스가 종료됩니다.");
 });
 
+//확인되지 않은 예외 처리 - 서버 프로세스 종료하지 않고 유지함
+process.on('uncaughtException', function (err) {
+	console.log('uncaughtException 발생함 : ' + err);
+	console.log('서버 프로세스 종료하지 않고 유지함.');
+	
+	console.log(err.stack);
+});
+
 app.on('close', function () {
 	console.log("Express 서버 객체가 종료됩니다.");
 });
 
 // Express Server Start
 http.createServer(app).listen(app.get('port'), function(){
-  console.log('Express Server Strart' + app.get('port'));
+	console.log('Express Server Strart' + app.get('port'));
+
+  // 데이터베이스 초기화
+	database.init(app, config);
 });
 
