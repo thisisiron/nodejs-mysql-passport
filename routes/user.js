@@ -72,23 +72,26 @@ module.exports.addContent = function(req, res){
 		});
 
 	}
-
-	
 }
 
-module.exports.photosave = function(req, res) {
-	console.log('/process/save 호출.');
+module.exports.profilephoto = function(req,res){
+	if (!req.user) {
+		console.log('사용자 인증 안된 상태임.');
+		res.render('index.ejs', {login_success:false});
+	} else { // 인증된 경우
+
+		console.log('req.user의 정보');
+		console.dir(req.user);
+
+		console.log('사용자 인증된 상태임.');
+		res.render('photo.html', {login_success:true});
+	}
+}
+
+module.exports.photo = function(req, res) {
+	console.log('/process/photo 호출.');
 	
 	try {
-		var paramAuthor = req.body.author;
-        var paramContents = req.body.contents;
-		var paramCreateDate = req.body.createDate;
-		
-		console.log('작성자 : ' + paramAuthor);
-		console.log('내용 : ' + paramContents);
-		console.log('일시 : ' + paramCreateDate);
- 
- 
         var files = req.files;
 	
 		console.dir('#===== 업로드된 첫번째 파일 정보 =====#')
@@ -101,37 +104,35 @@ module.exports.photosave = function(req, res) {
 			mimetype = '',
 			size = 0;
 		
-			if (Array.isArray(files)) {   // 배열에 들어가 있는 경우 (설정에서 1개의 파일도 배열에 넣게 했음)
-				console.log("배열에 들어있는 파일 갯수 : %d", files.length);
-				
-				for (var index = 0; index < files.length; index++) {
-					originalname = files[index].originalname;
-					filename = files[index].filename;
-					mimetype = files[index].mimetype;
-					size = files[index].size;
-				}
-	
-				console.log('현재 파일 정보 : ' + originalname + ', ' + filename + ', ' + mimetype + ', ' + size);
-	
-			} else {
-				console.log('업로드된 파일이 배열에 들어가 있지 않습니다.');
+		if (Array.isArray(files)) {   // 배열에 들어가 있는 경우 (설정에서 1개의 파일도 배열에 넣게 했음)
+			console.log("배열에 들어있는 파일 갯수 : %d", files.length);
+			
+			for (var index = 0; index < files.length; index++) {
+				originalname = files[index].originalname;
+				filename = files[index].filename;
+				mimetype = files[index].mimetype;
+				size = files[index].size;
 			}
+
+			console.log('현재 파일 정보 : ' + originalname + ', ' + filename + ', ' + mimetype + ', ' + size);
+
+		} else {
+			console.log('업로드된 파일이 배열에 들어가 있지 않습니다.');
+		}
 		
-        
+
         var database = req.app.get('database');
 
         if (database.pool) {
 
             var data = {
-                author:paramAuthor,
-                contents:paramContents,
-                createDate:paramCreateDate,
-                filename:filename
+				file_name:filename,
+				user_id: req.user.id
             };
             
             console.dir(database.memo);
             
-            database.memo.insertMemo(database.pool, data, function(err, added) {
+            database.photo.uploadPhoto(database.pool, data, function(err, added) {
                 
                 if (err) {
                     //에러발생
@@ -139,7 +140,8 @@ module.exports.photosave = function(req, res) {
                 }
                 
                 if (added) {
-                    //성공
+					//성공
+					res.send('<a href="#" class="thumbnail"><img src="/uploads/' + filename + '" width="200px"></a>');
                 } else {
                     console.log('파일저장실패')
                 }

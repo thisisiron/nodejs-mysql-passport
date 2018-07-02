@@ -5,7 +5,7 @@
  var user = {};
 
  var sql = {
-    loginUser:'select * from user where id = ? and password = ?',
+    loginUser:'select * from user where id = ?',
     insertUser:'insert into user set ?',
     findUser:'select * from user where id = ?'
 }
