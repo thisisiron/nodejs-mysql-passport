@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+		<title>Photo Upload</title>
+        
+	</head>
+    <body>
+        <h3>사진</h3>
+        <br>
+        <form method="post" enctype="multipart/form-data" action="/process/photo">
+            <table>
+                <tr>
+                    <td><label>사진</label></td>
+                    <td><input type="file" name="photo" id="photoInput" /><br><img src="" id="photoOutput" width="200px" /></td>
+                </tr>
+            </table>
+            <input type="submit" value="저장" name=""/>
+            <input type="button" value="닫기" />
+        </form>
+    </body>
+</html>

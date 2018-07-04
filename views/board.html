@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+		
+		<title>게시판</title>
+		
+		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
+    	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+    	
+    	<style>
+        	body        { padding-top:80px; }
+    	</style>
+    
+	</head>
+	<body>
+		<div class="container">
+            <br>
+         
+            <div class="ui raised segment">
+            
+                
+                <div class="ui blue fluid card">
+                     <div class="content">
+                                
+                        <form class="content ui form" method="post" action="/process/addpost">
+                            <h4 class="ui dividing header">글 쓰기 입력 항목</h4>
+                            <br>
+                            <div class="two fields">
+                                <div class="field">
+                                      <label>제목</label>
+                                    <input class="form-control" type="text" name="title" placeholder="제목 입력">
+                                </div>
+                                <div class="field"></div>
+                            </div>
+                            <br>
+                            <div class="field">
+                                <label>내용</label>
+                                <textarea class="form-control" id="contents" name="contents" rows="10" cols="80"></textarea>
+                            </div>		
+                                    
+                            <br><br>
+                            <input class="btn btn-success" type="submit" value="추가" name="" />
+                            <input class="btn btn-danger" type="button" value="취소" name="" onclick="javascript:history.back()" />
+                        </form>
+                        
+                        <br><br>
+                        
+                    </div>
+                </div>
+            </div>
+     
+        </div>
+
+	</body>
+</html>
