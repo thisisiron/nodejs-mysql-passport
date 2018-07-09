@@ -1,7 +1,7 @@
-// 에러 핸들러 모듈 사용
+// Using Error Handler Module
 var expressErrorHandler = require('express-error-handler');
 
-// 404 에러 페이지 처리
+// 404 Error page processing
 var error = {
     errorHandler: expressErrorHandler({
         static: {

@@ -3,13 +3,13 @@ var route_loader = {};
 var config = require('../config/config');
 
 route_loader.init = (app, router, upload) => {
-    console.log('route_loader init 호출')
+    console.log('Call route_loader init')
     
     initRoutes(app, router, upload);
 }
 
 function initRoutes(app, router, upload) {
-    console.log('initRoutes 호출됨.')
+    console.log('Call initRoutes')
 
     var infoLen = config.route_info.length;
 	console.log('설정에 정의된 라우팅 모듈의 수 : %d', infoLen);
@@ -22,7 +22,7 @@ function initRoutes(app, router, upload) {
 		var curModule = require(curItem.file);
 		console.log('%s 파일에서 모듈정보를 읽어옴.', curItem.file);
 		
-		//  라우팅 처리
+		// Routing Processing
 		if (curItem.type == 'get') {
             router.route(curItem.path).get(curModule[curItem.method]);
 		} else if (curItem.type == 'post') {
@@ -32,7 +32,7 @@ function initRoutes(app, router, upload) {
                 router.route(curItem.path).post(curModule[curItem.method]);
             }
 		} else {
-            console.log("라우팅 함수의 타입을 알 수 없다.")
+            console.log("Don't know the type of Routing Method")
 			router.route(curItem.path).post(curModule[curItem.method]);
 		}
 		
@@ -40,7 +40,7 @@ function initRoutes(app, router, upload) {
 		console.log('라우팅 모듈 [%s]이(가) 설정됨.', curItem.method);
     }
     
-    // 라우터 객체 등록
+    // Router registration
     app.use('/', router);
 }
 
