@@ -1,13 +1,13 @@
-// file upload 설정
+// file upload setting
 const multer = require('multer');
 var path = require('path');
 
 const storage = multer.diskStorage({
-    // callback 함수를 통해서 파일 저장 디렉토리 설정
+    // Set file save directory through callback function
     destination: function (req, file, callback) {
         callback(null, 'uploads')
     },
-    // callback 함수를 통해서 파일 이름 설정
+    // Set file name directory through callback function
     filename: function (req, file, callback) { 
         var extension = path.extname(file.originalname);
         var basename = path.basename(file.originalname, extension);
