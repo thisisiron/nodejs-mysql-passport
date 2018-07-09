@@ -2,35 +2,35 @@ const express = require('express');
 const http = require('http');
 const path = require('path');
 
-// Post 방식 사용
+// Using Post Method
 const bodyParser = require('body-parser');
 
-// Folder 개방
+// Folder opening
 const static = require('serve-static');
 
-// 라우터 객체 참조
-let cookieParser = require('cookie-parser')
+// Router object reference
+const cookieParser = require('cookie-parser')
 
-// Session 미들웨어 불러오기
+// Import Session Middleware
 var expressSession = require('express-session');
 
-// Passport 사용
+// Using Passport and flash 
 var passport = require('passport');
 var flash = require('connect-flash');
 
-// config 파일 불러오기
+// Import config file
 var config = require('./config/config');
 
-// 라우팅 처리 모듈 불러오기
+// Load routing processing module
 var route_loader = require('./routes/route_loader');
 
-// 에러 핸들러 모듈 사용
+// Using error handler module
 var error = require('./routes/error');
 
-// 익스프레스 객체 생성
+// Creating an Express object
 const app = express();
 
-// 뷰 엔진 설정
+// Set View Engine
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.engine('html', require('ejs').renderFile);
@@ -48,43 +48,47 @@ app.use(bodyParser.json())
 app.use('/public', static(path.join(__dirname, 'public')));
 app.use('/uploads', static(path.join(__dirname, 'uploads')));
  
-// cookie-parser 설정
+// Set cookie-parser
 app.use(cookieParser());
 
-// 세션 설정
+// Set Session
 app.use(expressSession({
 	secret:'my key',
 	resave:true,
 	saveUninitialized:true
 }));
 
+// Using Helmet that is a security program.
+var helmet = require('helmet');
+app.use(helmet());
 
-// Passport 사용 설정 
+// Ready to set passport settings
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash())
 
-// 모듈로 분리한 데이터베이스 파일 불러오기
-var database = require('./database/database');
-
 app.set('passport', passport);
 
+// Import database files
+var database = require('./database/database');
+
+
+// router creation and upload settings
 const router = express.Router();
 const upload = require('./config/fileupload').upload
 
-// router 설정
+// router settings
 route_loader.init(app, router, upload);
 
-// 패스포트 설정
+// Passport settings
 var configPassport = require('./config/passport');
 configPassport(app, passport);
 
-// 패스포트 라우팅 설정
+// Passport router settings
 var userPassport = require('./routes/user_passport');
 userPassport(router, passport);
 
-
-// Error Page 처리
+// Error Page Processing
 app.use( error.httpError );
 app.use( error.errorHandler );
 
@@ -94,7 +98,7 @@ process.on('SIGTERM', function () {
     console.log("프로세스가 종료됩니다.");
 });
 
-//확인되지 않은 예외 처리 - 서버 프로세스 종료하지 않고 유지함
+// 확인되지 않은 예외 처리 - 서버 프로세스 종료하지 않고 유지함
 process.on('uncaughtException', function (err) {
 	console.log('uncaughtException 발생함 : ' + err);
 	console.log('서버 프로세스 종료하지 않고 유지함.');
@@ -110,7 +114,7 @@ app.on('close', function () {
 http.createServer(app).listen(app.get('port'), function(){
 	console.log('Express Server Strart' + app.get('port'));
 
-  // 데이터베이스 초기화
+  // Initializing the database
 	database.init(app, config);
 });
 
