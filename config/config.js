@@ -2,11 +2,11 @@ var config = {
     server_port: 3000,
 
     db:{
-        connectionLimit : 10, // Connection을 몇 개 만들지 설정
+        connectionLimit : 10, // Set the number of Connection
         host     : 'localhost',
-        user     : 'root', // 데이터베이스 User
-        password : '12345', // password 입력
-        database : 'test', // 데이터베이스 명 입력
+        user     : 'root', // Database User
+        password : '12345', // Database password
+        database : 'test', // Database name
         debug    :  false
     },
 
@@ -28,12 +28,12 @@ var config = {
     facebook:{
         clientID: "",
         clientSecret:"",
-        callbackURL: ''
+        callbackURL: '/auth/facebook/callback'
     },
     google:{
         clientID:"",
         clientSecret:"",
-        callbackURL: ''
+        callbackURL: '/auth/google/callback'
     }
 
 };
