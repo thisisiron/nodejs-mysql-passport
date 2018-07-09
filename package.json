@@ -1,5 +1,5 @@
 {
-  "name": "create_simple_node",
+  "name": "node-mysql-passport",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/thisisiron/create_simple_node.js.git"
+    "url": "git+https://github.com/thisisiron/node-mysql-passport.js.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/thisisiron/create_simple_node.js/issues"
+    "url": "https://github.com/thisisiron/node-mysql-passport.js/issues"
   },
-  "homepage": "https://github.com/thisisiron/create_simple_node.js#readme",
+  "homepage": "https://github.com/thisisiron/node-mysql-passport.js#readme",
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
     "connect-flash": "^0.1.1",
